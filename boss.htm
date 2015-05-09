@@ -1,0 +1,708 @@
+
+<html>
+<head>
+
+ <style>
+
+
+  .approved{
+   background-color: #ffffff;
+   font-family: "Comic Sans MS", cursive, sans-serif;
+   font-style: italic;
+   color: #FFC90E;
+   //width: 50px;
+   // height: 50px;
+   //background: url(webimage/CheckBox.png) no-repeat;
+
+  }
+
+   .changedrow{
+   background-color: #ffffff;
+   font-family: "Comic Sans MS", cursive, sans-serif;
+   font-style: italic;
+   color: #FFC90E;
+  }
+
+  #right{
+   position:relative;
+   right:-200px;
+   top:-285px;
+   margin-left:800px;
+   align: left;
+  }
+
+  #left{
+   position:relative;
+   left:-300px;
+  }
+
+  label{
+  display:inline-block;
+  width:200px;
+  margin-right:30px;
+  text-align:right;
+  }
+
+  input{
+
+  }
+
+  fieldset{
+  width:500px;
+  margin:0px auto;
+
+  }
+
+ #tdiv{
+ font-size: 1.1em;
+    text-align: left;
+    padding-top: 5px;
+    padding-bottom: 4px;
+    background-color: #A7C942;
+    color: #ffffff;
+
+
+}
+ #PendingOrder{
+  position:relative;
+
+ }
+table {
+    font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+    position: ;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table td, table th {
+    font-size: 1em;
+    border: 1px solid #98bf21;
+    padding: 3px 7px 2px 7px;
+}
+
+table th {
+    font-size: 1.1em;
+    text-align: left;
+    padding-top: 5px;
+    padding-bottom: 4px;
+    background-color: #A7C942;
+    color: #ffffff;
+}
+
+table tr.alt td {
+    color: #000000;
+    background-color: #EAF2D3;
+}
+
+</style>
+
+<script src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-2.1.0.js"></script>
+
+<link rel="stylesheet" href="jquery-ui/jquery-ui.min.css">
+<script src="jquery-ui/external/jquery/jquery.js"></script>
+<script src="jquery-ui/jquery-ui.min.js"></script>
+
+ <script>
+$( document ).ready(function(){
+ 
+  //check session variable
+     var session
+$(window ).load("sessionstart.php",function(varet){
+  session= varet;
+  //alert (session);
+
+  })
+ ////////////////////////////////////////////////////////////////////////////////////////////
+  //Code for turning span to input:
+   var ldata
+   var Total
+   var ser
+   var rowid
+   var textbox=false;
+    $("#PendingOrder").on('click','.td',function(){
+     if($(this).attr('id')!='td8'){
+      if(!textbox){
+        var tdid= $(this).attr('id');
+        var cellname= $("#"+tdid).html().replace(/ /g,'');
+        rowid=$(this).parent('.tr').attr('id');
+          //alert(cellname);
+        var celldata= $(this).children("span").html();
+        $(this).children("span").remove();
+        var inputinfo= $('<input />', {'type': 'text','class': 'txtToInput', 'name': cellname, 'value': celldata, 'Primary':'', 'onchange':'updatepending()'});
+        $(this).append(inputinfo);
+        $(inputinfo).focus();
+        textbox=true;
+      }
+      }
+    });
+    //Code for turning input to span:
+      $("#PendingOrder").on('blur','.td',function(){
+         if(textbox){
+               var celldata= $(this).children("input").val();
+
+                   $(this).children("input").remove();
+                      var shpan= "<span> "+celldata+"</span >" ;
+
+                        $(this).append(shpan);
+                           textbox=false;
+                     }
+                       if (($(this).attr('id') == 'td6')||($(this).attr('id') == 'td5')){
+
+             var num= parseFloat(celldata)*parseFloat($(this).siblings('#td5').text())
+             //alert(num +" wee");
+                $(this).siblings('#td7').children().remove();
+                $(this).siblings('#td7').append("<span> "+num.toString()+"</span >") ;
+              }
+
+      });
+
+    function changeLineTotal(){
+            var QTY=  $(this).siblings("#td5").children().html();
+           var UP= $(this).siblings("#td6").children().html();
+           var LT = parseFloat(QTY) * parseFloat(UP);
+           //$(this).siblings("#td7").children().html()= QTY * UP;
+          alert( $(this).siblings("#td6").children().html());
+    };
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+///Change class of changed row.
+       $("#PendingOrder").on('change','.tr',function(){
+          var v
+           //v=$(this).attr('class');
+          // v+=" approvedrow"  ;
+           v="changedrow"
+          
+          $(this).attr('class',v);
+          
+
+           });
+
+ ///Submit changed rows by clicking Update Button.
+      $("#PendingOrder").on('click','#Update',function(){
+            var myserializearray=[];
+            var rowtodel=[];
+            var i;
+            i=0;
+           /////////for all changed rows collect row information to post.
+          $(".changedrow").each(function(){
+              var thisPrimary=$(this).attr('Primary');
+              var serializeobject={};
+                 ///if statement to add new row when empty row is filled in.
+                if ($(this).attr('Primary')==""){
+                  //alert("I'm going to append");
+                  var neworderrow=    "<tr id=trnew class=tr  Primary= >" ;
+                  neworderrow+=
+                		"<td id=td1 class=td><span>"+"</span></td>"
+                           	+"<td id=td2 class=td><span>"+"</span></td>"
+                            	+"<td id=td3 class=td><span>"+"new order"+"</span></td>"
+                             	+"<td id=td4 class=td><span>"+"</span></td>"
+                              	+"<td id=td5 class=td><span>"+"</span></td>"
+                              	+"<td id=td6 class=td><span>"+"</span></td>"
+                              	+"<td id=td7 class=td><span>"+"</span></td>"
+                              	+"<td id=td8 class=td align='center'><p>"+"</p></td>";
+                               	//alert (neworderrow);
+                         	 $("#PendingOrder > table > tbody > tr:first").after(neworderrow);
+                }
+              serializeobject.Primary= thisPrimary;
+
+              ////loop through each cell in table row to collect information.
+              $(this).children("td").each(function(index,element){
+
+                     var tdid =  $(this).attr('id');
+                     var cellname= $("#head"+" #"+tdid).text().replace(/ /g,'');
+
+                     var mystring=$(this).children("span").text()
+
+                              serializeobject[cellname]= mystring;
+
+                          ////     alert ("td "+JSON.stringify(serializeobject[cellname]));
+                ///do not collect anything in cell td7 or greater.
+               
+                if(tdid=="td8"){
+                   if ($(this).attr('class')=="approved")
+                   {
+                          rowtodel[i]=$(this).parent("tr").attr("id");
+                          alert(rowtodel[i]);
+                          alert(rowtodel);
+                          i++;
+
+                   }
+                }
+               
+                if(tdid=="td8") {
+                   // alert ("exit");
+
+                    return false;
+                }
+                 });
+              /////out of td
+                var num;
+                num=i.toString();
+                var arrnam="name"+i;
+               myserializearray.push(serializeobject);
+               console.log(JSON.stringify(myserializearray));
+             //  alert("json.stringify");
+             //  alert (JSON.stringify(myserializearray));
+               i++;
+          });
+           // alert("json.stringify out of loops");
+          //  alert (JSON.stringify({updatearr:myserializearray}));
+             console.log(JSON.stringify(myserializearray));
+        //   $.post("Update.php", {updatearr:myserializearray},function(info){         //UNCOMMENT THIS
+               //alert (info);
+               
+               $(".changedrow").each(function(){
+                 $(this).attr('class','tr');
+               });
+     //      });
+      //                alert(rowtodel[0] +"  about to delete");
+
+
+         for (x = 0; x < rowtodel.length; x++){
+                 $("#Pending"+" #"+rowtodel[x]).remove();
+                }
+       });
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      //Code for submission of changed row.
+       $("#PendingOrder").on('click','.subchange',function(){
+                var serializethis
+                serializethis="";
+            var v=$(this).parents('tr').attr('id');
+                    //var serializethis
+                    serializethis+="Primary"+"="+$(this).parents('.tr').attr('Primary')+"&"
+                    alert(serializethis);
+                    var i=0;
+           $("#"+v).children("td").each(function(index,element){
+                     i++
+                     var tdid =  $(this).attr('id');
+                     var cellname= $("#head"+" #"+tdid).text().replace(/ /g,'');
+
+                     var mystring=$(this).children("span").text()
+                       serializethis+=cellname+"="+mystring;//+"&";
+
+
+                if(tdid=="td7") {
+                   // alert ("exit");
+                    return false;
+                }
+                else
+                {
+                  serializethis+="&";
+                }
+
+             });
+
+
+                $.post("update.php",serializethis,function(info){
+
+                  $("#PendingOrder table").remove();
+                   alert ("In Update one");
+                    $.post("pending.php",function(info){
+                        var tbl= "<table>";
+                       ldata=info;
+                        var icount=0;
+                        var obj= $.parseJSON(info);
+                         alert ("In Update");
+                          OrderTotal (obj);
+                            tbl+=
+                            "<tr id=head>"
+                            +"<th id=td1> Job </th>"
+                            +"<th id=td2> Vendor </th>"
+                            +"<th id=td3> Item NO </th>"
+                            +"<th id=td4> Item Name </th>"
+                            +"<th id=td5> Qty </th>"
+                            +"<th id=td6> Unit Price </th>"
+                            +"<th id=td7> Line Total </th>"
+                            +"<th id=td8> Approve </th>"
+                            +"<th id=td9> Update </th>"
+                            +"<th id=td10> Delete </th>"
+                            //+"<th id=td11> Delete </th>"
+                            +"</tr>";
+                               icount++;
+                             //  alert(  icount + " is icount");
+                             tbl+=
+                                 "<tr id=tr"+icount+" "+"class=tr"+" "+"Primary="+">"
+                          	+"<td id=td1 class=td><span>"+"</span></td>"
+                           	+"<td id=td2 class=td><span>"+"</span></td>"
+                            	+"<td id=td3 class=td><span>"+"new order"+"</span></td>"
+                             	+"<td id=td4 class=td><span>"+"</span></td>"
+                              	+"<td id=td5 class=td><span>"+"</span></td>"
+                              	+"<td id=td6 class=td><span>"+"</span></td>"
+                              	+"<td id=td7 class=td><span>"+"</span></td>"
+                              	+"<td align='center'><input type='checkbox' name='approve' value='approved' ></td>"
+                                +"<td align='center'><button type='button' class='subchange' id='subchange"+icount+"' value='button text' style='width:100;height:25'></td>"
+                                +"<td align='center'><input type='checkbox' name='delete' ></td>"
+                               	+"</tr>" ;
+
+                        $.each(obj,function(index,value){
+                                 icount++;
+                        	//var newRow =
+                         	 tbl+=
+                                 "<tr id=tr"+icount+" "+"class=tr"+" "+"Primary="+value.Primary+">"
+                          	+"<td id=td1 class=td><span>"+value.Job+"</span></td>"
+                           	+"<td id=td2 class=td><span>"+value.Vendor+"</span></td>"
+                            	+"<td id=td3 class=td><span>"+value.ItemNo+"</span></td>"
+                             	+"<td id=td4 class=td><span>"+value.ItemName+"</span></td>"
+                              	+"<td id=td5 class=td><span>"+value.Qty+"</span></td>"
+                              	+"<td id=td6 class=td><span>"+value.UnitPrice+"</span></td>"
+                              	+"<td id=td7 class=td><span>"+value.LineTotal+"</span></td>"
+                              	+"<td align='center'><input type='checkbox' name='approve' value='approved' ></td>"
+                                +"<td align='center'><button type='button' class='subchange' id='subchange"+icount+"' value='button text' style='width:100;height:25'></td>"
+                                +"<td align='center'><input type='checkbox' name='delete' ></td>"
+                               	+"</tr>" ;
+
+                         });
+                         tbl+="</table>";
+                         $(tbl).appendTo("#PendingOrder");
+
+                });
+                });
+
+       });
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      //Code for tabulating all existing pending orders:
+         $.post("pending.php",function(info){
+                var UpdateButton ="<input type='button' name='Update' id='Update' value='Update' style='float:right' size='20'> <br>   "
+                //var UndoChanges ="<input type='button' name='UndoChanges' id='UndoChanges' value='Undo Changes' style='float:right' size='20'>   <br>"
+              $("#PendingOrder").append(UpdateButton);
+              //$("#PendingOrder").append(UndoChanges);
+              
+
+
+                        var tbl= "<table id='mytable'>";
+                       ldata=info;
+
+                        var icount=0;
+                        var obj= $.parseJSON(info);
+                            OrderTotal (obj);
+                            tbl+=
+                            "<tr id=head>"
+                            +"<th id=td1> Job </th>"
+                            +"<th id=td2> Vendor </th>"
+                            +"<th id=td3> Item NO </th>"
+                            +"<th id=td4> Item Name </th>"
+                            +"<th id=td5> Qty </th>"
+                            +"<th id=td6> Unit Price </th>"
+                            +"<th id=td7> Line Total </th>"
+                            +"<th id=td8> Approve </th>"
+                          //  +"<th id=td9> Update </th>"
+                            +"<th id=td10> Delete </th>"
+                            //+"<th id=td11> Delete </th>"
+                            +"</tr>";
+                               icount++;
+
+                             tbl+=
+                                 "<tr id=tr"+icount+" "+"class=tr"+" "+"Primary="+">"
+                          	+"<td id=td1 class=td><span>"+"</span></td>"
+                           	+"<td id=td2 class=td><span>"+"</span></td>"
+                            	+"<td id=td3 class=td><span>"+"new order"+"</span></td>"
+                             	+"<td id=td4 class=td><span>"+"</span></td>"
+                              	+"<td id=td5 class=td><span>"+"</span></td>"
+                              	+"<td id=td6 class=td><span>"+"</span></td>"
+                              	+"<td id=td7 class=td><span>"+"</span></td>"
+                              	+"<td id=td8 class=td align='center'><p>"+"</p></td>"
+
+                                      //<input type='checkbox' name='approve' class='approve' value='approve' ></td>"
+                               // +"<td align='center'><button type='button' class='subchange' id='subchange"+icount+"' value='button text' style='width:100;height:25'></td>"
+                                
+                                if (sesssion ="boss"){
+                                 tbl+=
+                                "<td align='center'><input type='checkbox' name='delete' disabled='disabled'></td>"
+                               	+"</tr>" ;
+
+                               	}
+
+                        $.each(obj,function(index,value){
+                                 icount++;
+                        	//var newRow =
+                         	 tbl+=
+                                 "<tr id=tr"+icount+" "+"class=tr"+" "+"Primary="+value.Primary+">"
+                          	+"<td id=td1 class=td><span>"+value.Job+"</span></td>"
+                           	+"<td id=td2 class=td><span>"+value.Vendor+"</span></td>"
+                            	+"<td id=td3 class=td><span>"+value.ItemNo+"</span></td>"
+                             	+"<td id=td4 class=td><span>"+value.ItemName+"</span></td>"
+                              	+"<td id=td5 class=td><span>"+value.Qty+"</span></td>"
+                              	+"<td id=td6 class=td><span>"+value.UnitPrice+"</span></td>"
+                              	+"<td id=td7 class=td><span>"+value.LineTotal+"</span></td>"
+                           	+"<td id=td8 class=td align='center'><p>"+"</p></td>"
+
+                                      //<input type='checkbox' name='approve' class='approve' value='approve' ></td>"
+                               // +"<td align='center'><button type='button' class='subchange' id='subchange"+icount+"' value='button text' style='width:100;height:25'></td>"
+                                 if (sesssion ="boss"){
+                                 tbl+=
+                                "<td align='center'><input type='checkbox' name='delete' disabled='disabled'></td>"
+                               	+"</tr>" ;
+                                }
+                                	//$(newRow).appendTo("#Pending");
+                         });
+                         tbl+="</table>";
+                         $(tbl).appendTo("#PendingOrder");
+                              //	$("#Pending").append(	$("#Pending").html(info));
+                });
+
+
+
+ ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+   //Code for Search.
+       $("#PendingSearch").click(function(){
+          var squery
+         squery= $("#tdiv input").serialize()      ;
+
+         squery+="&";
+
+          $("#PendingOrder table").remove();
+               $.post("search.php",squery,function(info){
+                        var tbl= "<table>";
+                       ldata=info;
+                            // alert(info);
+                        var icount=0;
+                        var obj= $.parseJSON(info);
+                             OrderTotal (obj);
+                            // alert(obj);
+
+                            tbl+=
+                            "<tr id=head>"
+                            +"<th id=td1> Job </th>"
+                            +"<th id=td2> Vendor </th>"
+                            +"<th id=td3> Item NO </th>"
+                            +"<th id=td4> Item Name </th>"
+                            +"<th id=td5> Qty </th>"
+                            +"<th id=td6> Unit Price </th>"
+                            +"<th id=td7> Line Total </th>"
+                            +"<th id=td8> Approve </th>"
+                            +"<th id=td9> Update </th>"
+                            +"<th id=td10> Delete </th>"
+                            //+"<th id=td11> Delete </th>"
+                            +"</tr>";
+                               icount++;
+
+                             tbl+=
+                                 "<tr id=tr"+icount+" "+"class=tr"+" "+"Primary="+">"
+                          	+"<td id=td1 class=td><span>"+"</span></td>"
+                           	+"<td id=td2 class=td><span>"+"</span></td>"
+                            	+"<td id=td3 class=td><span>"+"new order"+"</span></td>"
+                             	+"<td id=td4 class=td><span>"+"</span></td>"
+                              	+"<td id=td5 class=td><span>"+"</span></td>"
+                              	+"<td id=td6 class=td><span>"+"</span></td>"
+                              	+"<td id=td7 class=td><span>"+"</span></td>"
+                              	+"<td align='center'><input type='checkbox' name='approve' value='approved' ></td>"
+                                +"<td align='center'><button type='button' class='subchange' id='subchange"+icount+"' value='button text' style='width:100;height:25'></td>"
+                                
+                                if (sesssion ="boss"){
+                                 tbl+=
+                                "<td align='center'><input type='checkbox' name='delete' disabled='disabled'></td>"
+                               	+"</tr>" ;
+
+                               	}
+
+                        $.each(obj,function(index,value){
+                                 icount++;
+                        	//var newRow =
+                         	 tbl+=
+                                 "<tr id=tr"+icount+" "+"class=tr"+" "+"Primary="+value.Primary+">"
+                          	+"<td id=td1 class=td><span>"+value.Job+"</span></td>"
+                           	+"<td id=td2 class=td><span>"+value.Vendor+"</span></td>"
+                            	+"<td id=td3 class=td><span>"+value.ItemNo+"</span></td>"
+                             	+"<td id=td4 class=td><span>"+value.ItemName+"</span></td>"
+                              	+"<td id=td5 class=td><span>"+value.Qty+"</span></td>"
+                              	+"<td id=td6 class=td><span>"+value.UnitPrice+"</span></td>"
+                              	+"<td id=td7 class=td><span>"+value.LineTotal+"</span></td>"
+                              	+"<td align='center'><input type='checkbox' name='approve' class='approve' value='approved' ></td>"
+                                +"<td align='center'><button type='button' class='subchange' id='subchange"+icount+"' value='button text' style='width:100;height:25'></td>"
+                                 if (sesssion ="boss"){
+                                 tbl+=
+                                "<td align='center'><input type='checkbox' name='delete' disabled='disabled'></td>"
+                               	+"</tr>" ;
+                                }
+                                	//$(newRow).appendTo("#Pending");
+                         });
+                         tbl+="</table>";
+                         $(tbl).appendTo("#PendingOrder");
+                              //	$("#Pending").append(	$("#Pending").html(info));
+                });
+
+                OrderTotal (obj); ///Print order total inside TotalMetrics div.
+
+                });
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//PendingOrder on load, calculate Total.
+function OrderTotal(obj){
+
+       Total =0;
+        $.each(obj,function(index,value){
+           Total+=parseFloat(value.LineTotal)     ;
+
+        });        
+                                   //alert("I'm about to change this");
+        $("#TotalMetrics span").replaceWith("<span>Total pending order in the amount of $"+Total.toString()+"</span>");
+};
+
+//////////////////////////////////////////
+ ///Change approved class.
+       $("#PendingOrder").on('click','#td8',function(){
+          var obj= $.parseJSON(ldata);
+
+            if($(this).attr('class')!='approved'){
+
+               var app="<span> Approved </span>";
+               $(this).append(app);
+
+            $(this).attr('class','approved');
+        //     alert($(this).attr('class'));
+             $(this).parent('.tr').attr('class','changedrow');             //change row class also.
+             } else{
+              $(this).attr('class','approve');
+                $(this).children("span").remove();
+             }
+       });
+
+///////Last Bracket////////////////
+       });
+
+
+</script>
+</head>
+  
+<body>
+
+<div class="accordion" id="accordion">
+
+<h3>Pending</h3>
+<div class="Pending" id="Pending">
+
+    <div id="tdiv" >
+
+
+            <div id="left" >
+            <fieldset >
+              <legend><span>Search</span></legend>
+                <label for="txtJob">Job:</label><input type="text" name="Job" size="20">
+                <label for="txtItem">Item:</label><input type="text" name="ItemName" size="20">
+                <label for="txtItemNo">Item No:</label><input type="text" name="ItemNo" size="20">
+                <label for="txtPerson">Person:</label><input type="text" name="Person" size="20">
+                <label for="txtVendor">Vendor:</label><input type="text" name="Vendor" size="20">
+                <label for="txtPurchaseOrder">Purchase Order:</label><input type="text" name="PurchaseOrder" size="20">
+                <input type="hidden" name="submitted" value="true">   <br>
+                <br>
+                <input type="button" name="Search" id="PendingSearch" value="Search" style="float:right" size="20">   <br>
+              </fieldset>
+            </div>
+             <div id="right" >
+
+             <form action="uploaded.php" method="POST" enctype="multipart/form-data">
+
+              <fieldset >
+              <legend><span>Upload</span></legend>
+               <a href="sample.csv">Sample Order</a><br><br>
+                 <input type="file" name="file"><br><br>
+                 <input type="submit" value="Submit">
+              </fieldset>
+
+              </form>
+              
+
+
+             </div>
+             <div id="TotalMetrics" >
+                             <span>Total Metrics</span>
+             </div>
+
+    </div>
+    <div id="PendingOrder">
+
+
+    </div>
+
+
+
+</div>
+ <h3>Approved</h3>
+<div class="Approved" id="Approved">
+
+
+</div>
+<h3>Ordered</h3>
+<div class="Ordered" id="Ordered">
+
+
+</div>
+</div>
+<script src="jquery-ui/external/jquery/jquery.js"></script>
+<script src="jquery-ui/jquery-ui.js"></script>
+<script>
+
+$( "#accordion" ).accordion({
+ heightStyle: "content"
+});
+     $(function() {
+$( "#accordion" ).accordion({
+event: "click hoverintent"
+});
+});
+/*
+* hoverIntent | Copyright 2011 Brian Cherne
+* http://cherne.net/brian/resources/jquery.hoverIntent.html
+* modified by the jQuery UI team
+*/
+$.event.special.hoverintent = {
+setup: function() {
+$( this ).bind( "mouseover", jQuery.event.special.hoverintent.handler );
+},
+teardown: function() {
+$( this ).unbind( "mouseover", jQuery.event.special.hoverintent.handler );
+},
+handler: function( event ) {
+var currentX, currentY, timeout,
+args = arguments,
+target = $( event.target ),
+previousX = event.pageX,
+previousY = event.pageY;
+function track( event ) {
+currentX = event.pageX;
+currentY = event.pageY;
+};
+function clear() {
+target
+.unbind( "mousemove", track )
+.unbind( "mouseout", clear );
+clearTimeout( timeout );
+}
+function handler() {
+var prop,
+orig = event;
+if ( ( Math.abs( previousX - currentX ) +
+Math.abs( previousY - currentY ) ) < 7 ) {
+clear();
+event = $.Event( "hoverintent" );
+for ( prop in orig ) {
+if ( !( prop in event ) ) {
+event[ prop ] = orig[ prop ];
+}
+}
+// Prevent accessing the original event since the new event
+// is fired asynchronously and the old event is no longer
+// usable (#6028)
+delete event.originalEvent;
+target.trigger( event );
+} else {
+previousX = currentX;
+previousY = currentY;
+timeout = setTimeout( handler, 100 );
+}
+}
+timeout = setTimeout( handler, 100 );
+target.bind({
+mousemove: track,
+mouseout: clear
+});
+}
+};
+</script>
+</body>
+</html>

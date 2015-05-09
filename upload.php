@@ -1,0 +1,16 @@
+<?php
+
+header('Content-Type: application/json');
+
+$uploaded = array();
+
+if (!empty($_Files['file']['name'][0])) {
+  foreach($_Files['file']['name'] as $position =>$name){
+  if (move_uploaded_file($_FILES['file']['tmp_name'][$position], 'uploads/' . $name)) {
+    $uploaded[] = array(
+      'name'=>$name
+      'file'=>'uploads/' . $name
+    );
+    }
+  }
+}

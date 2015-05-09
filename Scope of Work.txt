@@ -1,0 +1,18 @@
+process approval.
+   Move to approve table.
+   update approve table on web.
+   delete values from pending.
+   
+
+Upload order
+   make template. 
+   upload to mysql.
+   check for format.
+
+permissions.
+
+log who is making changes, submitting requests, and approving.
+
+upload supporting material.
+
+Delete from pending.
